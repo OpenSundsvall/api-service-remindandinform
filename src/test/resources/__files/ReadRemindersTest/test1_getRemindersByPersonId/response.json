@@ -1,0 +1,19 @@
+[{
+  "action": "Förnya tillstånd",
+  "caseId": "caseId",
+  "caseLink": "caseLink",
+  "organizationId": "fbfbd90c-4c47-11ec-81d3-0242ac130012",
+  "personId": "fbfbd90c-4c47-11ec-81d3-0242ac130001",
+  "reminderDate": "2021-11-25",
+  "reminderId": "R-fbfbd90c-4c47-11ec-81d3-0242ac130001"
+},
+  {
+    "action": "Det är julafton",
+    "caseId": "caseId2",
+    "caseLink": "caseLink2",
+    "organizationId": "fbfbd90c-4c47-11ec-81d3-0242ac130013",
+    "personId": "fbfbd90c-4c47-11ec-81d3-0242ac130001",
+    "reminderDate": "2021-12-24",
+    "reminderId": "R-fbfbd90c-4c47-11ec-81d3-0242ac130002"
+  }
+]

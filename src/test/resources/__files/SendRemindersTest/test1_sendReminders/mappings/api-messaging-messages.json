@@ -1,0 +1,53 @@
+{
+	"name": "api-messaging",
+	"request": {
+		"urlPath": "/api-messaging/messages",
+		"method": "POST",
+		"bodyPatterns": [
+			{
+				"equalToJson": {
+					"messages": [
+						{
+							"message": "TestMessageÅÄÖåäö",
+							"partyId": "fbfbd90c-4c47-11ec-81d3-0242ac130003",
+							"sender" : {
+								"emailAddress" : "TestEmailAddressÅÄÖåäö",
+								"emailName" : "TestEmailNameÅÄÖåäö",
+								"smsName" : "TestSmsNameÅÄÖåäö"
+						},
+							"subject": "TestSubjectÅÄÖåäö"
+						},
+						{
+							"message": "TestMessageÅÄÖåäö",
+							"partyId": "fbfbd90c-4c47-11ec-81d3-0242ac130001",
+							"sender" : {
+								"emailAddress" : "TestEmailAddressÅÄÖåäö",
+								"emailName" : "TestEmailNameÅÄÖåäö",
+								"smsName" : "TestSmsNameÅÄÖåäö"
+							},
+							"subject": "TestSubjectÅÄÖåäö"
+
+						},
+						{
+							"message": "TestMessageÅÄÖåäö",
+							"partyId": "fbfbd90c-4c47-11ec-81d3-0242ac130002",
+							"sender" : {
+								"emailAddress" : "TestEmailAddressÅÄÖåäö",
+								"emailName" : "TestEmailNameÅÄÖåäö",
+								"smsName" : "TestSmsNameÅÄÖåäö"
+							},
+							"subject": "TestSubjectÅÄÖåäö"
+						}
+					]
+				}
+			}
+		]
+	},
+	"response": {
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"status": 200,
+		"bodyFileName": "SendRemindersTest/test1_sendReminders/mocking/api-messaging-messages-response.json"
+	}
+}

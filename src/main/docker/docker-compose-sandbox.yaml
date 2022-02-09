@@ -1,0 +1,50 @@
+version: "3"
+services:
+  ms-remindandinform-sandbox:
+    # TODO add correct name matching nexus repository also add build number parameter as suffix
+    container_name: ms-remindandinform-sandbox
+    image: 'ms-remindandinform:sandbox'
+    network_mode: bridge
+    links:
+      - 'ms-remindandinform-wiremock-sandbox:wiremock'
+      - 'ms-remindandinform-db-sandbox:mariadb'
+    restart: always
+    build:
+      context: ../../..
+      dockerfile: src/main/docker/Dockerfile
+    ports:
+      - '9080:8080'
+    environment:
+      QUARKUS_PROFILE: 'sandbox'
+      API_MESSAGING_MP_REST_URL: 'http://wiremock:8080/api-messaging'
+      QUARKUS_OIDC_CLIENT_API_MESSAGING_AUTH_SERVER_URL: 'http://wiremock:8080/api-gateway'
+      QUARKUS_OIDC_CLIENT_API_MESSAGING_TOKEN_PATH: '/token'
+      QUARKUS_DATASOURCE_JDBC_URL: 'jdbc:mariadb://mariadb:3306/dev-reminder'
+      QUARKUS_DATASOURCE_USERNAME: 'dev-user'
+      QUARKUS_DATASOURCE_PASSWORD: 'dev-password'
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: 'drop-and-create'
+    depends_on:
+      - ms-remindandinform-db-sandbox
+      - ms-remindandinform-wiremock-sandbox
+
+  ms-remindandinform-db-sandbox:
+    container_name: ms-remindandinform-db-sandbox
+    image: 'mariadb:10.6.4'
+    network_mode: bridge
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD : 'yes'
+      MARIADB_DATABASE: 'dev-reminder'
+      MARIADB_USER: 'dev-user'
+      MARIADB_PASSWORD: 'dev-password'
+    expose:
+      - '3306'
+
+  ms-remindandinform-wiremock-sandbox:
+    container_name: ms-remindandinform-wiremock-sandbox
+    image: wiremock/wiremock
+    network_mode: bridge
+    restart: always
+    expose:
+      - '8080'
+    volumes:
+      - $PWD/src/test/resources/sandbox:/home/wiremock

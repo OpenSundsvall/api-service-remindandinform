@@ -1,0 +1,9 @@
+{
+	"action": "Renew application",
+	"caseId": "12345",
+	"caseLink": "http://test.sundsvall.se/case1337",
+	"organizationId": "81471222-5798-11e9-ae24-57fa13b361e2",
+	"personId": "81471222-5798-11e9-ae24-57fa13b361e1",
+	"reminderDate": "2021-12-01",
+	"reminderId": "reminderId"
+}

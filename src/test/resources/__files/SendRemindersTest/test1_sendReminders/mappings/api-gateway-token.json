@@ -1,0 +1,11 @@
+{
+	"name": "api-gateway",
+	"request": {
+		"urlPath": "/api-gateway/token",
+		"method": "POST"
+	},
+	"response": {
+		"status": 200,
+		"bodyFileName": "SendRemindersTest/test1_sendReminders/mocking/api-gateway-token-response.json"
+	}
+}

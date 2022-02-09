@@ -1,0 +1,368 @@
+---
+openapi: 3.0.2
+info:
+  title: Messaging API
+  description: "API used to send messages, as e-mail or SMS"
+  version: "1.2"
+tags:
+  - name: Messaging API endpoints
+paths:
+  /messages:
+    post:
+      tags:
+        - Messaging API endpoints
+      summary: Send messages as email or SMS to list of recipients.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageRequest'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesStatusResponse'
+        "400":
+          description: Bad request - correct message id (UUID) must be provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+  /messages/email:
+    post:
+      tags:
+        - Messaging API endpoints
+      summary: Send an e-mail (independent from feedback settings)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageStatusResponse'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+  /messages/sms:
+    post:
+      tags:
+        - Messaging API endpoints
+      summary: Send an SMS (independent from feedback settings)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsRequest'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageStatusResponse'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+  /messages/status/{messageId}:
+    get:
+      tags:
+        - Messaging API endpoints
+      summary: Get message status by id
+      parameters:
+        - name: messageId
+          in: path
+          description: Message id (UUID)
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryEntryResponse'
+        "400":
+          description: Bad request - correct message id (UUID) must be provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+  /messages/{partyId}/conversationHistory:
+    get:
+      tags:
+        - Messaging API endpoints
+      summary: Get the conversation history for a given party id
+      parameters:
+        - name: partyId
+          in: path
+          description: Party id (UUID)
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoryEntryResponse'
+        "204":
+          description: No content - no recipient statuses found
+        "400":
+          description: Bad request - correct party ID (UUID) must be provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceErrorResponse'
+components:
+  schemas:
+    Attachment:
+      type: object
+      properties:
+        content:
+          description: The attachment (file) content as a BASE64-encoded string
+          type: string
+          example: aGVsbG8gd29ybGQK
+        name:
+          description: The attachment filename
+          type: string
+          example: test.txt
+        contentType:
+          description: The attachment content type
+          type: string
+          example: text/plain
+    EmailRequest:
+      description: E-mail representation
+      required:
+        - emailAddress
+      type: object
+      properties:
+        sender:
+          $ref: '#/components/schemas/EmailSender'
+        emailAddress:
+          description: Recipient e-mail address
+          pattern: \S
+          type: string
+          nullable: false
+        partyId:
+          description: Party id
+          type: string
+          example: f7b379e6-3e0b-4f32-9812-e10279dd3d0a
+        subject:
+          description: E-mail subject
+          type: string
+        message:
+          description: E-mail plain-text body
+          type: string
+        htmlMessage:
+          description: E-mail HTML body (BASE64-encoded)
+          type: string
+        attachments:
+          description: Attachments
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+    EmailSender:
+      description: Sender details
+      type: object
+      properties:
+        name:
+          description: Sender name
+          type: string
+        emailAddress:
+          description: Sender e-mail address
+          type: string
+    HistoryEntryResponse:
+      type: object
+      properties:
+        sender:
+          type: string
+        recipient:
+          type: string
+        partyId:
+          type: string
+        messageType:
+          type: string
+        message:
+          type: string
+        sent:
+          type: boolean
+        details:
+          type: string
+        timestamp:
+          format: date-time
+          type: string
+    Message:
+      description: A message to be sent
+      required:
+        - partyId
+        - message
+      type: object
+      properties:
+        sender:
+          $ref: '#/components/schemas/Sender'
+        partyId:
+          description: The party id
+          minLength: 1
+          type: string
+          example: f427952b-247c-4d3b-b081-675a467b3619
+          nullable: false
+        subject:
+          description: The message subject (for e-mails)
+          type: string
+        message:
+          description: The message text
+          minLength: 1
+          type: string
+          nullable: false
+    MessageRequest:
+      description: Message representation
+      required:
+        - messages
+      type: object
+      properties:
+        messages:
+          description: The messages to be sent
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+    MessageStatusResponse:
+      type: object
+      properties:
+        messageId:
+          type: string
+        sent:
+          type: boolean
+    MessagesStatusResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageStatusResponse'
+    Sender:
+      description: Sender details
+      type: object
+      properties:
+        emailName:
+          description: Sender name for E-mail
+          type: string
+        smsName:
+          description: Sender name for SMS
+          maxLength: 11
+          type: string
+        emailAddress:
+          description: Sender e-mail address
+          type: string
+    ServiceErrorResponse:
+      type: object
+      properties:
+        httpCode:
+          format: int32
+          type: integer
+        message:
+          type: string
+        technicalDetails:
+          $ref: '#/components/schemas/TechnicalDetails'
+    SmsRequest:
+      description: SMS representation
+      required:
+        - sender
+        - mobileNumber
+        - message
+      type: object
+      properties:
+        sender:
+          description: The sender of the SMS
+          maxLength: 11
+          pattern: \S
+          type: string
+          nullable: false
+        partyId:
+          description: Party id
+          type: string
+        mobileNumber:
+          description: The mobile phone number to send the SMS to. (Should start with
+            +467x)
+          pattern: \S
+          type: string
+          nullable: false
+        message:
+          description: The SMS message contents
+          pattern: \S
+          type: string
+          nullable: false
+    TechnicalDetails:
+      type: object
+      properties:
+        rootCode:
+          format: int32
+          type: integer
+        rootCause:
+          type: string
+        serviceId:
+          type: string
+        requestId:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
