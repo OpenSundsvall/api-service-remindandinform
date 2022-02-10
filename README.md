@@ -1,84 +1,66 @@
-# api-service-remindandinform Project
+# RemindAndInform
 
-[RemindAndinform documentation](https://sundsvall.atlassian.net/wiki/spaces/SK/pages/823558153/RemindAndInform)
+## Leverantör
 
-## Config
+Sundsvalls kommun
 
-### Production-config
-
-- **API Gateway:**                  api-i.sundsvall.se
-    - **Endpoint:**                 Production
-- **Server:**                       microservices.sundsvall.se
-- **DB:**                           Maria DB
-- **Dependency versions:**          Production
-
-### Test-config
-
-- **API Gateway:**                  api-i-test.sundsvall.se
-    - **Endpoint:**                 Production
-- **Server:**                       microservices-test.sundsvall.se
-- **DB:**                           Maria DB
-- **Dependency versions:**          Test
-
-### Sandbox-config
-
-- **API Gateway:**                  api-i-test.sundsvall.se
-    - **Endpoint:**                 Sandbox
-- **Server:**                       microservices-test.sundsvall.se
-- **DB:**                           Maria DB
-- **Dependency versions:**          Mocked (Wiremock)
+## Beskrivning
+RemindAndInform är en tjänst där man kan registrera påminnelser som skickas ut vid angiven tidpunkt.
 
 
-## Running the application in dev mode
+## Tekniska detaljer
 
-You can run your application in dev mode that enables live coding using:
-```shell script
-./mvnw compile quarkus:dev
+### Integrationer
+Tjänsten integrerar mot:
+
+* Messaging
+
+### Starta tjänsten
+
+|Miljövariabel|Beskrivning|
+|---|---|
+|**Databasinställningar**||
+|`QUARKUS_DATASOURCE_DB_KIND`|Typ av databas|
+|`QUARKUS_DATASOURCE_JDBC_URL`|JDBC-URL för anslutning till databas|
+|`QUARKUS_DATASOURCE_USERNAME`|Användarnamn för anslutning till databas|
+|`QUARKUS_DATASOURCE_PASSWORD`|Lösenord för anslutning till databas|
+|`QUARKUS_HIBERNATE_ORM_DIALECT`|Databasdialekt|
+|`QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION`|Anger om, och i sådana fall hur databasen ska hanteras vid uppstart. Giltiga värden: `none`, `update`, `validate`, `drop-and-create` (endast i test)|
+|**Inställningar för tjänsten Messaging**|
+|`API_MESSAGING_MP_REST_URL`| API-URL till tjänsten Messaging|
+|`QUARKUS_OIDC_CLIENT_API_MESSAGING_AUTH_SERVER_URL`| URL för att hämta OAuth2-token för Messaging|
+|`QUARKUS_OIDC_CLIENT_API_MESSAGING_TOKEN_PATH`| Path för token resursen (t.ex. /token)|
+|`QUARKUS_OIDC_CLIENT_API_MESSAGING_CLIENT_ID`| OAuth2-klient-id för Messaging |
+|`QUARKUS_OIDC_CLIENT_API_MESSAGING_CREDENTIALS_SECRET`| OAuth2-klient-nyckel för Messaging |
+
+
+### Paketera och starta tjänsten
+Applikationen kan paketeras genom:
+
 ```
-
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
-
-## Running the application on local computer as docker container
-
-In order to run the docker container you must have Docker installed on your computer (for Windows: Docker Desktop).
-
-Use this command to build and run the application with sandbox config, using a native build:  
-`docker-compose -f src/main/docker/docker-compose-sandbox.yaml build && docker-compose -f src/main/docker/docker-compose-sandbox.yaml up`
-
-Use this command to build and run the application with sandbox config, using JVM build:  
-`docker-compose -f src/main/docker/docker-compose-sandbox-jvm.yaml build && docker-compose -f src/main/docker/docker-compose-sandbox-jvm.yaml up`
-
-## Packaging and running the application
-
-The application can be packaged using:
-```shell script
 ./mvnw package
 ```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+Kommandot skapar filen `quarkus-run.jar` i katalogen `target/quarkus-app`. Tjänsten kan nu köras genom kommandot `java -jar target/quarkus-app/quarkus-run.jar`.
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+### Bygga och starta med Docker
+För att bygga en Docker-image:
 
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
+```
+docker build -f src/main/docker/Dockerfile -t api.sundsvall.se/ms-remindandinform:latest .
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+För att starta samma Docker-image i en container:
 
-## Creating a native executable
-
-You can create a native executable using: 
-```shell script
-./mvnw package -Pnative
+```
+docker run -i --rm -p 8080:8080 api.sundsvall.se/ms-remindandinform
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
+För att bygga och starta en container i sandbox mode:
+
+```
+docker-compose -f src/main/docker/docker-compose-sandbox.yaml build && docker-compose -f src/main/docker/docker-compose-sandbox.yaml up
 ```
 
-You can then execute your native executable with: `./target/api-service-remindandinform-1.0.0-SNAPSHOT-runner`
 
-You can also create a native executable packaged in a docker image using:  
-`docker-compose -f src/main/docker/docker-compose.yaml build`
+## 
+Copyright (c) 2021 Sundsvalls kommun
