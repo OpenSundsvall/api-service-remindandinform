@@ -1,4 +1,6 @@
 # RemindAndInform
+![bild](https://user-images.githubusercontent.com/75727533/158782106-cef39169-6276-4ce0-af3f-ef7e62c34800.png)
+
 
 ## Leverantör
 
